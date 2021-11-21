@@ -1,57 +1,27 @@
 package br.edu.infnet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class App {
 
-	private static String[] nomes;
-	private static float[] notasAV1;
-	private static float[] notasAV2;
-	private static float[] mediasFinais;
-	private static String[] situacoes;
+	private static List<Aluno> alunos;
 
 	private static int qtde = 0;
 	private static final int QTDE_MAX = 100;
 
-	private static void impressao(){
-		System.out.println("---- Relatório de Alunos ----");
+	private static void imprimeAlunos(){
+		System.out.println("---- Relatorio de Alunos ----");
 
-		for (int j = 0; j < qtde; j++) {
-			impressao(j);
+		for (Aluno aluno : alunos) {
+			aluno.imprimeAluno();
 		}
 		System.out.println("-----------------------------------");
 	}
 
-	private static float calcularMediasFinais(int index){
-		return ((notasAV1[index] + notasAV2[index])/ 2);
-	}
-
-	private static String obterSituacao(float media){
-		if (media >= 7) {
-			return ("Aprovado");
-		}else if(media < 7 || media >= 4){
-			return ("Prova final");
-		}else{
-			return("Reprovado");
-		}
-	}
-
-	private static void impressao(int index){		
-
-		System.out.println( index + " - Nome do aluno: " + nomes[index]);
-		System.out.println("Nota da AV1: " + notasAV1[index]);
-		System.out.println("Nota da AV2: " + notasAV2[index]);
-		System.out.println("Média final: " + mediasFinais[index]);
-		System.out.println("Situação: " + situacoes[index]);  
-	}
-
 	public static void main(String[] args){
 
-		nomes = new String[QTDE_MAX];
-		notasAV1 = new float[QTDE_MAX];
-		notasAV2 = new float[QTDE_MAX];
-		mediasFinais = new float[QTDE_MAX];
-		situacoes = new String[QTDE_MAX];
-
+		alunos = new ArrayList<Aluno>();
 		int opcao = 0;		
 
 		Scanner in = new Scanner(System.in);
@@ -61,50 +31,71 @@ public class App {
 			System.out.println("[2] Consultar boletim de um aluno");
 			System.out.println("[3] Consultar notas da tuma");
 			System.out.println("[4] Sair");
-			System.out.print("Informe a opção desejada: ");
-			opcao = in.nextInt();
+			System.out.print("Informe a opcao desejada: ");
+			
+			try{
+				opcao = Integer.valueOf(in.next());
+			}catch(NumberFormatException e) {
+				System.out.println("Opcao invalida!!!");
+			}
+			
+			
+			
 			switch (opcao) {
 			case 1:
 				if(qtde < QTDE_MAX) {
-					System.out.print("Informe o nome do aluno: ");
-					nomes[qtde] = in.next();
-					
-					System.out.print("Informe a sua Nota da AV1: ");
-					notasAV1[qtde] = in.nextFloat();
-					
-					System.out.print("Informe o sua Nota da AV2: ");
-					notasAV2[qtde] = in.nextFloat();
 
-					mediasFinais[qtde] = calcularMediasFinais(qtde);
+					try {
+						Aluno aluno = new Aluno();
+						
+						System.out.print("Informe o nome do aluno: ");
+						aluno.setNome(in.next());
+						
+						System.out.print("Informe a sua Nota da AV1: ");
+						aluno.setNotaAV1(Float.valueOf(in.next()));
+						
+						System.out.print("Informe a sua Nota da AV2: ");
+						aluno.setNotaAV2(Float.valueOf(in.next()));
+						
+						aluno.setMatricula(qtde);
+						aluno.setMedia(aluno.getNotaAV1(), aluno.getNotaAV2());
+						aluno.setSituacao(aluno.getMedia());
+						aluno.imprimeAluno();
+						alunos.add(aluno);
+						
+						qtde++;
+					}catch(NumberFormatException e) {
+						System.out.println("Cadastro invalido!!!");
+					}
 
-					situacoes[qtde] = obterSituacao(mediasFinais[qtde]);
 
-					impressao(qtde);
-
-					qtde++;
 				} else {
-					System.out.println("Impossível realizar o cadastramento!!!");
+					System.out.println("Impossivel realizar o cadastramento!!!");
 				}
 				break;
 			case 2:
-				System.out.println("Informe a matrícula do aluno: ");
-				int matricula = in.nextInt();
-
-				if(matricula >= 0 && matricula < qtde) {
-					impressao(matricula);
-				} else {
-					System.out.println("A matrícula " + matricula + " é inválida!!");
-				}				
+				try {
+					System.out.println("Informe a matricula do aluno: ");
+					int matricula = Integer.valueOf(in.next());
+					
+					if(matricula >= 0 && matricula < alunos.size()) {
+						alunos.get(matricula).imprimeAluno();
+					} else {
+						System.out.println("A matricula " + matricula + " eh invalida!!");
+					}
+				}catch(NumberFormatException e) {
+					System.out.println("Matricula invalida!!!");
+				}
 				break;
 
 			case 3:
-				impressao();			
+				imprimeAlunos();			
 				break;
 			case 4:
 				System.out.println("sair");
 				break;
 			default:
-				System.out.println("Opção inválida!!!");
+				System.out.println("Opcao invalida!!!");
 				break;
 			}			
 		} while (opcao != 4);
